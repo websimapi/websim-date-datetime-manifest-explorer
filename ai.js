@@ -168,8 +168,5 @@ Return JSON:
     }
 }
 
-// Initialize AI parser when manifest is loaded
-let aiDateParser = null;
-
 // Export for use in other files
 window.AIDateParser = AIDateParser;
