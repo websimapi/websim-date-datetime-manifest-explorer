@@ -1,0 +1,318 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "description": "Comprehensive date/datetime handling manifest for web browsers",
+    "lastUpdated": "2024-01-01",
+    "targetEnvironment": "Browser JavaScript",
+    "compatibility": {
+      "ecmaScript": "ES2015+",
+      "browsers": {
+        "chrome": "24+",
+        "firefox": "29+",
+        "safari": "10+",
+        "edge": "12+"
+      }
+    }
+  },
+  "nativeJavaScript": {
+    "dateObject": {
+      "constructor": {
+        "new Date()": "Current date/time",
+        "new Date(milliseconds)": "From Unix timestamp",
+        "new Date(dateString)": "Parse from string",
+        "new Date(year, month, day, hour, minute, second, millisecond)": "From components (month is 0-based)"
+      },
+      "staticMethods": {
+        "Date.now()": "Current timestamp in milliseconds",
+        "Date.parse(dateString)": "Parse string to timestamp",
+        "Date.UTC(year, month, day, hour, minute, second, millisecond)": "UTC timestamp from components"
+      },
+      "instanceMethods": {
+        "getters": {
+          "getFullYear()": "4-digit year",
+          "getMonth()": "Month (0-11)",
+          "getDate()": "Day of month (1-31)",
+          "getDay()": "Day of week (0-6, Sunday=0)",
+          "getHours()": "Hour (0-23)",
+          "getMinutes()": "Minutes (0-59)",
+          "getSeconds()": "Seconds (0-59)",
+          "getMilliseconds()": "Milliseconds (0-999)",
+          "getTime()": "Unix timestamp",
+          "getTimezoneOffset()": "Minutes offset from UTC"
+        },
+        "utcGetters": {
+          "getUTCFullYear()": "UTC year",
+          "getUTCMonth()": "UTC month (0-11)",
+          "getUTCDate()": "UTC day",
+          "getUTCDay()": "UTC day of week",
+          "getUTCHours()": "UTC hour",
+          "getUTCMinutes()": "UTC minutes",
+          "getUTCSeconds()": "UTC seconds",
+          "getUTCMilliseconds()": "UTC milliseconds"
+        },
+        "setters": {
+          "setFullYear(year, month?, date?)": "Set year",
+          "setMonth(month, date?)": "Set month (0-11)",
+          "setDate(date)": "Set day of month",
+          "setHours(hour, min?, sec?, ms?)": "Set hour",
+          "setMinutes(min, sec?, ms?)": "Set minutes",
+          "setSeconds(sec, ms?)": "Set seconds",
+          "setMilliseconds(ms)": "Set milliseconds",
+          "setTime(timestamp)": "Set from timestamp"
+        },
+        "utcSetters": {
+          "setUTCFullYear(year, month?, date?)": "Set UTC year",
+          "setUTCMonth(month, date?)": "Set UTC month",
+          "setUTCDate(date)": "Set UTC day",
+          "setUTCHours(hour, min?, sec?, ms?)": "Set UTC hour",
+          "setUTCMinutes(min, sec?, ms?)": "Set UTC minutes",
+          "setUTCSeconds(sec, ms?)": "Set UTC seconds",
+          "setUTCMilliseconds(ms)": "Set UTC milliseconds"
+        },
+        "formatting": {
+          "toString()": "Full date string",
+          "toDateString()": "Date portion only",
+          "toTimeString()": "Time portion only",
+          "toISOString()": "ISO 8601 format (YYYY-MM-DDTHH:mm:ss.sssZ)",
+          "toUTCString()": "UTC string format",
+          "toLocaleDateString()": "Localized date",
+          "toLocaleTimeString()": "Localized time",
+          "toLocaleString()": "Localized date and time",
+          "toJSON()": "JSON serialization (same as toISOString)"
+        }
+      }
+    },
+    "intlDateTimeFormat": {
+      "constructor": "new Intl.DateTimeFormat(locales?, options?)",
+      "commonLocales": [
+        "en-US", "en-GB", "fr-FR", "de-DE", "es-ES", "it-IT", "ja-JP", "ko-KR", "zh-CN", "zh-TW", "ru-RU", "ar-SA", "hi-IN"
+      ],
+      "options": {
+        "dateStyle": ["full", "long", "medium", "short"],
+        "timeStyle": ["full", "long", "medium", "short"],
+        "weekday": ["long", "short", "narrow"],
+        "era": ["long", "short", "narrow"],
+        "year": ["numeric", "2-digit"],
+        "month": ["numeric", "2-digit", "long", "short", "narrow"],
+        "day": ["numeric", "2-digit"],
+        "hour": ["numeric", "2-digit"],
+        "minute": ["numeric", "2-digit"],
+        "second": ["numeric", "2-digit"],
+        "fractionalSecondDigits": [1, 2, 3],
+        "timeZoneName": ["long", "short", "shortOffset", "longOffset", "shortGeneric", "longGeneric"],
+        "formatMatcher": ["basic", "best fit"],
+        "hour12": [true, false],
+        "timeZone": "IANA timezone identifier or UTC"
+      },
+      "methods": {
+        "format(date)": "Format date according to options",
+        "formatToParts(date)": "Return array of formatted parts",
+        "formatRange(startDate, endDate)": "Format date range",
+        "formatRangeToParts(startDate, endDate)": "Format range to parts",
+        "resolvedOptions()": "Get resolved formatting options"
+      }
+    }
+  },
+  "standardFormats": {
+    "iso8601": {
+      "fullDateTime": "YYYY-MM-DDTHH:mm:ss.sssZ",
+      "dateOnly": "YYYY-MM-DD",
+      "timeOnly": "HH:mm:ss.sss",
+      "withTimezone": "YYYY-MM-DDTHH:mm:ss.sss±HH:mm",
+      "examples": [
+        "2024-01-15T14:30:00.000Z",
+        "2024-01-15",
+        "14:30:00.000",
+        "2024-01-15T14:30:00.000+05:30"
+      ]
+    },
+    "rfc2822": {
+      "format": "ddd, DD MMM YYYY HH:mm:ss ±HHMM",
+      "example": "Mon, 15 Jan 2024 14:30:00 +0000"
+    },
+    "unix": {
+      "timestamp": "Seconds since 1970-01-01 00:00:00 UTC",
+      "timestampMs": "Milliseconds since 1970-01-01 00:00:00 UTC",
+      "examples": [1705329000, 1705329000000]
+    },
+    "commonPatterns": {
+      "US": "MM/DD/YYYY",
+      "European": "DD/MM/YYYY",
+      "ISO": "YYYY-MM-DD",
+      "timeFormats": {
+        "12hour": "hh:mm:ss AM/PM",
+        "24hour": "HH:mm:ss"
+      }
+    }
+  },
+  "timezones": {
+    "concepts": {
+      "UTC": "Coordinated Universal Time - baseline timezone",
+      "GMT": "Greenwich Mean Time - essentially same as UTC",
+      "DST": "Daylight Saving Time - seasonal time adjustments",
+      "offset": "Hours/minutes difference from UTC"
+    },
+    "ianaTimezones": {
+      "examples": [
+        "America/New_York",
+        "America/Los_Angeles",
+        "Europe/London",
+        "Europe/Paris",
+        "Asia/Tokyo",
+        "Asia/Kolkata",
+        "Australia/Sydney"
+      ],
+      "url": "https://www.iana.org/time-zones"
+    },
+    "browserSupport": {
+      "getTimezoneOffset()": "Returns local timezone offset in minutes",
+      "timeZone": "Supported in Intl.DateTimeFormat options",
+      "detection": "Use Intl.DateTimeFormat().resolvedOptions().timeZone"
+    }
+  },
+  "parsing": {
+    "nativeParsing": {
+      "Date.parse()": {
+        "supports": ["ISO 8601", "RFC 2822", "Implementation-specific formats"],
+        "returns": "Timestamp in milliseconds or NaN",
+        "caution": "Behavior varies between browsers for ambiguous formats"
+      },
+      "constructor": {
+        "new Date(string)": "Calls Date.parse() internally",
+        "reliability": "Use explicit parsing for production code"
+      }
+    },
+    "recommendedApproach": {
+      "iso8601": "Use Date.parse() or new Date() for ISO format",
+      "customFormats": "Use regular expressions and manual parsing",
+      "libraries": "Consider date-fns, moment.js, or dayjs for complex parsing"
+    },
+    "commonPitfalls": {
+      "monthZeroBased": "JavaScript months are 0-11, not 1-12",
+      "timezoneHandling": "Local vs UTC interpretation varies",
+      "yearShortcuts": "2-digit years interpreted differently",
+      "invalidDates": "new Date('invalid') creates Invalid Date object"
+    }
+  },
+  "validation": {
+    "checkMethods": {
+      "isValidDate": "!isNaN(date.getTime())",
+      "isLeapYear": "(year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0)",
+      "daysInMonth": "new Date(year, month + 1, 0).getDate()"
+    },
+    "regexPatterns": {
+      "iso8601": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z?$",
+      "usDate": "^(0?[1-9]|1[0-2])\\/(0?[1-9]|[12]\\d|3[01])\\/(\\d{4})$",
+      "europeanDate": "^(0?[1-9]|[12]\\d|3[01])\\/(0?[1-9]|1[0-2])\\/(\\d{4})$",
+      "time24": "^([01]?\\d|2[0-3]):[0-5]\\d:[0-5]\\d$",
+      "time12": "^(0?[1-9]|1[0-2]):[0-5]\\d:[0-5]\\d\\s?(AM|PM)$"
+    }
+  },
+  "calculations": {
+    "arithmetic": {
+      "addDays": "date.setDate(date.getDate() + days)",
+      "addMonths": "date.setMonth(date.getMonth() + months)",
+      "addYears": "date.setFullYear(date.getFullYear() + years)",
+      "difference": "Math.abs(date2.getTime() - date1.getTime())",
+      "daysBetween": "Math.ceil((date2 - date1) / (1000 * 60 * 60 * 24))"
+    },
+    "comparisons": {
+      "equality": "date1.getTime() === date2.getTime()",
+      "before": "date1 < date2",
+      "after": "date1 > date2",
+      "sameDay": "date1.toDateString() === date2.toDateString()"
+    },
+    "ranges": {
+      "isInRange": "date >= startDate && date <= endDate",
+      "weekStart": "Most commonly Sunday (0) or Monday (1)",
+      "quarterStart": "Q1: Jan, Q2: Apr, Q3: Jul, Q4: Oct"
+    }
+  },
+  "performance": {
+    "recommendations": {
+      "caching": "Cache Intl.DateTimeFormat instances for repeated use",
+      "avoid": "Avoid creating new Date objects in loops",
+      "timestamps": "Use timestamps for calculations, format only for display",
+      "utc": "Use UTC methods when timezone doesn't matter"
+    },
+    "benchmarks": {
+      "creation": "new Date() vs Date.now() for timestamp only",
+      "formatting": "toLocaleString() vs Intl.DateTimeFormat.format()",
+      "parsing": "Date.parse() vs manual parsing performance varies"
+    }
+  },
+  "libraries": {
+    "popular": {
+      "date-fns": {
+        "cdn": "https://esm.sh/date-fns",
+        "features": ["Functional", "Tree-shakable", "TypeScript"],
+        "size": "~13KB (individual functions)"
+      },
+      "dayjs": {
+        "cdn": "https://esm.sh/dayjs",
+        "features": ["Moment.js API", "Lightweight", "Plugin system"],
+        "size": "~2KB + plugins"
+      },
+      "luxon": {
+        "cdn": "https://esm.sh/luxon",
+        "features": ["Immutable", "Timezone aware", "Duration support"],
+        "size": "~67KB"
+      }
+    },
+    "comparison": {
+      "native": "Best performance, limited functionality",
+      "date-fns": "Great for functional programming, large ecosystem",
+      "dayjs": "Smallest size, familiar API",
+      "luxon": "Most features, best timezone support"
+    }
+  },
+  "bestPractices": {
+    "storage": {
+      "database": "Always store in UTC timezone",
+      "json": "Use ISO 8601 format for serialization",
+      "cookies": "Consider timezone for expiration dates"
+    },
+    "display": {
+      "localization": "Use Intl.DateTimeFormat for user-facing dates",
+      "timezone": "Show user's local timezone by default",
+      "accessibility": "Provide full date in title/aria-label"
+    },
+    "input": {
+      "validation": "Always validate user input dates",
+      "parsing": "Be explicit about expected formats",
+      "feedback": "Show clear error messages for invalid dates"
+    },
+    "testing": {
+      "fixedDates": "Use fixed dates in tests, not new Date()",
+      "timezones": "Test across different timezones",
+      "edgeCases": "Test leap years, DST transitions, month boundaries"
+    }
+  },
+  "commonErrors": {
+    "monthOffByOne": "Remember months are 0-indexed in JavaScript",
+    "mutatingDates": "Date objects are mutable, clone before modifying",
+    "timezoneAssumptions": "Don't assume user's timezone",
+    "invalidDateHandling": "Check for Invalid Date objects",
+    "parseFloat": "Don't use parseFloat on date strings",
+    "stringCoercion": "Be careful with automatic string conversion"
+  },
+  "examples": {
+    "basicUsage": {
+      "currentDate": "new Date()",
+      "specificDate": "new Date(2024, 0, 15)",
+      "fromString": "new Date('2024-01-15T10:30:00Z')",
+      "fromTimestamp": "new Date(1705329000000)"
+    },
+    "formatting": {
+      "iso": "date.toISOString()",
+      "locale": "date.toLocaleDateString('en-US')",
+      "custom": "new Intl.DateTimeFormat('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).format(date)"
+    },
+    "calculations": {
+      "addDays": "const newDate = new Date(date); newDate.setDate(newDate.getDate() + 7);",
+      "startOfMonth": "new Date(date.getFullYear(), date.getMonth(), 1)",
+      "endOfMonth": "new Date(date.getFullYear(), date.getMonth() + 1, 0)"
+    }
+  }
+}
+
