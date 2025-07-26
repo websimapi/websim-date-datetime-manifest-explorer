@@ -105,13 +105,11 @@ ${verificationResult.verifiedSteps.filter(step => !step.valid).map(step =>
     `- ${step.type}: Expected ${step.expected}, but calculated ${step.calculated}`
 ).join('\n')}
 
-CRITICAL: You must recalculate using the ACTUAL JavaScript Date system. Use these current reference points:
-- Current date: ${new Date().toISOString()}
-- Current Julian Day: ${this.calculateJulianDay(new Date())}
+CRITICAL: You must recalculate using the ACTUAL JavaScript Date system. For all calculations, use timestamps derived from \`new Date("YYYY-MM-DD").getTime()\`. Do NOT use your internal Julian Day calculator, as it has been shown to be inaccurate. Base all math on JavaScript timestamps.
 
 For historical dates, calculate the Julian Day using the standard Julian Day formula and verify it matches JavaScript Date calculations.
 
-Provide a CORRECTED mathematical proof with accurate Julian Day numbers that will pass verification. Make sure all base dates use Julian Day numbers that match what JavaScript Date.getTime() produces.
+Provide a CORRECTED mathematical proof with accurate numbers that will pass verification. Make sure all base dates use Julian Day numbers and timestamps that match what JavaScript's \`Date\` object produces.
 
 Return the same JSON schema as before, but with corrected calculations.`;
 
@@ -273,8 +271,11 @@ Return the same JSON schema as before, but with corrected calculations.`;
 
     evaluateEquation(equation) {
         // Safe equation evaluator for basic arithmetic
+        // Only evaluate the part before an equals sign if present
+        let evalPart = equation.split('=')[0];
+
         // Remove any non-numeric, non-operator characters for safety
-        const safeEquation = equation.replace(/[^0-9+\-*/.() ]/g, '');
+        const safeEquation = evalPart.replace(/[^0-9+\-*/.() ]/g, '');
         
         // Simple evaluation using Function constructor (safer than eval)
         try {
@@ -286,23 +287,32 @@ Return the same JSON schema as before, but with corrected calculations.`;
 
     verifyConversion(conversion) {
         try {
+            // Handle cases where AI response is malformed.
+            if (!conversion || !conversion.formula) {
+                 return null;
+            }
+            
             // Handle common date conversions
             if (conversion.formula.includes('Julian Day')) {
-                const julianDayMatch = conversion.from.match(/Julian Day (\d+)/);
+                const julianDayMatch = conversion.from.match(/Julian Day (\d+(\.\d+)?)/);
                 if (julianDayMatch) {
-                    const julianDay = parseInt(julianDayMatch[1]);
+                    const julianDay = parseFloat(julianDayMatch[1]);
                     const convertedDate = this.julianDayToDate(julianDay);
-                    return convertedDate.toISOString().split('T')[0]; // Return date part only
+                    // Check if conversion result matches what's expected
+                    const expectedDatePart = conversion.result.split('T')[0];
+                    const convertedDatePart = convertedDate.toISOString().split('T')[0];
+                    return expectedDatePart === convertedDatePart ? conversion.result : null;
                 }
             }
             
             // Handle timestamp conversions
             if (conversion.formula.includes('timestamp')) {
-                const timestampMatch = conversion.from.match(/(\d+)/);
+                const timestampMatch = conversion.from.match(/(-?\d+)/);
                 if (timestampMatch) {
-                    const timestamp = parseInt(timestampMatch[1]);
+                    const timestamp = parseInt(timestampMatch[1], 10);
                     const date = new Date(timestamp);
-                    return date.toISOString();
+                    // Check if conversion result matches what's expected
+                    return date.toISOString() === conversion.result ? conversion.result : null;
                 }
             }
             
