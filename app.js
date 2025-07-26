@@ -190,12 +190,76 @@ async function parseTextWithAI() {
         return;
     }
     
-    result.innerHTML = '🤖 Parsing with AI...';
+    result.innerHTML = '🤖 Parsing with AI and verifying calculations...';
     
     try {
         const parsed = await aiDateParser.parseTextDate(input, format);
         
         if (parsed.success) {
+            let verificationHtml = '';
+            if (parsed.verificationResult) {
+                const verification = parsed.verificationResult;
+                const verificationColor = verification.success ? 'green' : 'red';
+                const verificationIcon = verification.success ? '✅' : '❌';
+                
+                verificationHtml = `
+                    <div style="border-top: 1px solid #ddd; margin-top: 15px; padding-top: 15px;">
+                        <div style="color: ${verificationColor};"><strong>${verificationIcon} Mathematical Verification:</strong> ${verification.success ? 'PASSED' : 'FAILED'}</div>
+                        ${verification.errors.length > 0 ? `<div style="color: red;"><strong>Errors:</strong> ${verification.errors.join(', ')}</div>` : ''}
+                        <div><strong>Verified Steps:</strong></div>
+                        ${verification.verifiedSteps.map(step => `
+                            <div style="margin: 5px 0; padding: 5px; background: ${step.valid ? '#e8f5e8' : '#ffe8e8'}; border-radius: 3px;">
+                                <div><strong>${step.type}:</strong> ${step.description || step.step || `${step.from} → ${step.to}`}</div>
+                                ${step.equation ? `<div><strong>Equation:</strong> ${step.equation}</div>` : ''}
+                                <div><strong>Expected:</strong> ${step.expected} | <strong>Calculated:</strong> ${step.calculated} | <strong>Valid:</strong> ${step.valid ? '✅' : '❌'}</div>
+                            </div>
+                        `).join('')}
+                        ${verification.finalResult ? `<div><strong>Final Julian Day:</strong> ${verification.finalResult}</div>` : ''}
+                        <div><strong>Matches Expected Result:</strong> ${verification.matchesExpected ? '✅ Yes' : '❌ No'}</div>
+                    </div>
+                `;
+            }
+            
+            let mathProofHtml = '';
+            if (parsed.mathematicalProof) {
+                const proof = parsed.mathematicalProof;
+                mathProofHtml = `
+                    <div style="border-top: 1px solid #ddd; margin-top: 15px; padding-top: 15px;">
+                        <div><strong>🧮 Mathematical Proof:</strong></div>
+                        ${proof.baseDates ? `
+                            <div><strong>Base Dates:</strong></div>
+                            ${proof.baseDates.map(base => `
+                                <div style="margin: 5px 0; padding: 5px; background: #f0f8ff; border-radius: 3px;">
+                                    <div><strong>${base.description}:</strong> ${base.date}</div>
+                                    <div><strong>Julian Day:</strong> ${base.julianDay} | <strong>Timestamp:</strong> ${base.timestamp}</div>
+                                </div>
+                            `).join('')}
+                        ` : ''}
+                        ${proof.calculations ? `
+                            <div><strong>Calculations:</strong></div>
+                            ${proof.calculations.map(calc => `
+                                <div style="margin: 5px 0; padding: 5px; background: #fff8f0; border-radius: 3px;">
+                                    <div><strong>Step:</strong> ${calc.step}</div>
+                                    <div><strong>Equation:</strong> ${calc.equation}</div>
+                                    <div><strong>Result:</strong> ${calc.result}</div>
+                                </div>
+                            `).join('')}
+                        ` : ''}
+                        ${proof.conversions ? `
+                            <div><strong>Conversions:</strong></div>
+                            ${proof.conversions.map(conv => `
+                                <div style="margin: 5px 0; padding: 5px; background: #f8fff0; border-radius: 3px;">
+                                    <div><strong>From:</strong> ${conv.from} → <strong>To:</strong> ${conv.to}</div>
+                                    <div><strong>Formula:</strong> ${conv.formula}</div>
+                                    <div><strong>Result:</strong> ${conv.result}</div>
+                                </div>
+                            `).join('')}
+                        ` : ''}
+                        ${proof.verification ? `<div><strong>Verification Method:</strong> ${proof.verification}</div>` : ''}
+                    </div>
+                `;
+            }
+            
             result.innerHTML = `
                 <div style="color: green;"><strong>✅ Successfully parsed!</strong></div>
                 <div><strong>Original:</strong> ${input}</div>
@@ -204,6 +268,8 @@ async function parseTextWithAI() {
                 <div><strong>Requested Format:</strong> ${parsed.requestedFormat}</div>
                 <div><strong>Confidence:</strong> ${Math.round(parsed.confidence * 100)}%</div>
                 ${parsed.reasoning ? `<div><strong>AI Reasoning:</strong> ${parsed.reasoning}</div>` : ''}
+                ${mathProofHtml}
+                ${verificationHtml}
             `;
         } else {
             result.innerHTML = `
