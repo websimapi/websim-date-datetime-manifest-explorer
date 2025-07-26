@@ -212,6 +212,79 @@
         </div>
 
         <div class="card">
+            <h2>🤖 AI-Powered Date Parser</h2>
+            <div class="demo-section">
+                <div class="demo-box">
+                    <h3>Smart Text Parser</h3>
+                    <div class="input-group">
+                        <label for="aiTextInput">Enter any date format:</label>
+                        <input type="text" id="aiTextInput" placeholder="tomorrow, 2nd of January, in 3 days, etc.">
+                    </div>
+                    <div class="input-group">
+                        <label for="aiOutputFormat">Desired output format:</label>
+                        <select id="aiOutputFormat">
+                            <option value="ISO">ISO 8601</option>
+                            <option value="US">US Format (MM/DD/YYYY)</option>
+                            <option value="European">European (DD/MM/YYYY)</option>
+                            <option value="long">Long Date</option>
+                            <option value="relative">Relative (e.g., "in 3 days")</option>
+                        </select>
+                    </div>
+                    <button class="btn" onclick="parseTextWithAI()">🧠 Parse with AI</button>
+                    <div class="result" id="aiTextResult"></div>
+                </div>
+
+                <div class="demo-box">
+                    <h3>Image Date Extractor</h3>
+                    <div class="input-group">
+                        <label for="aiImageInput">Upload image with dates:</label>
+                        <input type="file" id="aiImageInput" accept="image/*">
+                    </div>
+                    <div class="input-group">
+                        <label for="aiImageFormat">Output format:</label>
+                        <select id="aiImageFormat">
+                            <option value="ISO">ISO 8601</option>
+                            <option value="US">US Format</option>
+                            <option value="European">European</option>
+                            <option value="long">Long Date</option>
+                        </select>
+                    </div>
+                    <button class="btn" onclick="parseImageWithAI()">📸 Extract from Image</button>
+                    <div class="result" id="aiImageResult"></div>
+                </div>
+
+                <div class="demo-box">
+                    <h3>Format Converter</h3>
+                    <div class="input-group">
+                        <label for="convertInput">Date to convert:</label>
+                        <input type="text" id="convertInput" placeholder="01/15/2024">
+                    </div>
+                    <div class="input-group">
+                        <label for="fromFormat">From format:</label>
+                        <select id="fromFormat">
+                            <option value="US">US (MM/DD/YYYY)</option>
+                            <option value="European">European (DD/MM/YYYY)</option>
+                            <option value="ISO">ISO 8601</option>
+                            <option value="auto">Auto-detect</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="toFormat">To format:</label>
+                        <select id="toFormat">
+                            <option value="ISO">ISO 8601</option>
+                            <option value="US">US Format</option>
+                            <option value="European">European</option>
+                            <option value="RFC2822">RFC 2822</option>
+                            <option value="Unix">Unix Timestamp</option>
+                        </select>
+                    </div>
+                    <button class="btn" onclick="convertWithAI()">🔄 Convert Format</button>
+                    <div class="result" id="aiConvertResult"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
             <h2>🔧 Interactive Date Tools</h2>
             <div class="demo-section">
                 <div class="demo-box">
@@ -317,8 +390,8 @@ const daysDiff = Math.ceil((date2 - date1) / (1000 * 60 * 60 * 24));
         </div>
     </div>
 
+    <script src="ai.js"></script>
     <script src="app.js"></script>
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4c6229722a6346bc8eb5cb0e5eae5d41","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
-

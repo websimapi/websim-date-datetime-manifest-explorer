@@ -1,10 +1,14 @@
 let dateManifest = null;
+let aiDateParser = null;
 
 // Load the manifest on page load
 document.addEventListener('DOMContentLoaded', async function() {
     try {
         const response = await fetch('date-manifest.json');
         dateManifest = await response.json();
+        
+        // Initialize AI parser
+        aiDateParser = new AIDateParser(dateManifest);
         
         updateCurrentDateTime();
         showFormatExamples();
@@ -176,6 +180,122 @@ function syntaxHighlight(json) {
     });
 }
 
+// AI-powered functions
+async function parseTextWithAI() {
+    const input = document.getElementById('aiTextInput').value;
+    const format = document.getElementById('aiOutputFormat').value;
+    const result = document.getElementById('aiTextResult');
+    
+    if (!input.trim()) {
+        result.innerHTML = '<span style="color: red;">Please enter some text to parse</span>';
+        return;
+    }
+    
+    result.innerHTML = '🤖 Parsing with AI...';
+    
+    try {
+        const parsed = await aiDateParser.parseTextDate(input, format);
+        
+        if (parsed.success) {
+            result.innerHTML = `
+                <div style="color: green;"><strong>✅ Successfully parsed!</strong></div>
+                <div><strong>Original:</strong> ${input}</div>
+                <div><strong>Detected Format:</strong> ${parsed.originalFormat}</div>
+                <div><strong>Parsed Date:</strong> ${parsed.parsedDate}</div>
+                <div><strong>Requested Format:</strong> ${parsed.requestedFormat}</div>
+                <div><strong>Confidence:</strong> ${Math.round(parsed.confidence * 100)}%</div>
+            `;
+        } else {
+            result.innerHTML = `<div style="color: red;"><strong>❌ Failed to parse:</strong> ${parsed.error}</div>`;
+        }
+    } catch (error) {
+        result.innerHTML = `<div style="color: red;"><strong>❌ Error:</strong> ${error.message}</div>`;
+    }
+}
+
+async function parseImageWithAI() {
+    const input = document.getElementById('aiImageInput');
+    const format = document.getElementById('aiImageFormat').value;
+    const result = document.getElementById('aiImageResult');
+    
+    if (!input.files || !input.files[0]) {
+        result.innerHTML = '<span style="color: red;">Please select an image file</span>';
+        return;
+    }
+    
+    result.innerHTML = '📸 Analyzing image...';
+    
+    try {
+        // Convert image to data URL
+        const file = input.files[0];
+        const reader = new FileReader();
+        
+        reader.onload = async function(e) {
+            try {
+                const imageDataUrl = e.target.result;
+                const parsed = await aiDateParser.parseImageDate(imageDataUrl, format);
+                
+                if (parsed.success && parsed.foundDates.length > 0) {
+                    const datesHtml = parsed.foundDates.map(date => `
+                        <div style="margin: 10px 0; padding: 10px; background: #f0f8ff; border-radius: 5px;">
+                            <div><strong>Found Text:</strong> ${date.text}</div>
+                            <div><strong>Parsed Date:</strong> ${date.parsedDate}</div>
+                            <div><strong>Formatted:</strong> ${date.requestedFormat}</div>
+                            <div><strong>Location:</strong> ${date.location}</div>
+                            <div><strong>Confidence:</strong> ${Math.round(date.confidence * 100)}%</div>
+                        </div>
+                    `).join('');
+                    
+                    result.innerHTML = `
+                        <div style="color: green;"><strong>✅ Found ${parsed.foundDates.length} date(s)!</strong></div>
+                        ${datesHtml}
+                    `;
+                } else {
+                    result.innerHTML = `<div style="color: orange;"><strong>⚠️ No dates found in image</strong></div>`;
+                }
+            } catch (error) {
+                result.innerHTML = `<div style="color: red;"><strong>❌ Error:</strong> ${error.message}</div>`;
+            }
+        };
+        
+        reader.readAsDataURL(file);
+    } catch (error) {
+        result.innerHTML = `<div style="color: red;"><strong>❌ Error:</strong> ${error.message}</div>`;
+    }
+}
+
+async function convertWithAI() {
+    const input = document.getElementById('convertInput').value;
+    const fromFormat = document.getElementById('fromFormat').value;
+    const toFormat = document.getElementById('toFormat').value;
+    const result = document.getElementById('aiConvertResult');
+    
+    if (!input.trim()) {
+        result.innerHTML = '<span style="color: red;">Please enter a date to convert</span>';
+        return;
+    }
+    
+    result.innerHTML = '🔄 Converting format...';
+    
+    try {
+        const converted = await aiDateParser.convertDateFormat(input, fromFormat, toFormat);
+        
+        if (converted.success) {
+            result.innerHTML = `
+                <div style="color: green;"><strong>✅ Successfully converted!</strong></div>
+                <div><strong>Original:</strong> ${converted.originalDate}</div>
+                <div><strong>From Format:</strong> ${converted.fromFormat}</div>
+                <div><strong>To Format:</strong> ${converted.toFormat}</div>
+                <div><strong>Result:</strong> ${converted.convertedDate}</div>
+            `;
+        } else {
+            result.innerHTML = `<div style="color: red;"><strong>❌ Conversion failed:</strong> ${converted.error}</div>`;
+        }
+    } catch (error) {
+        result.innerHTML = `<div style="color: red;"><strong>❌ Error:</strong> ${error.message}</div>`;
+    }
+}
+
 // Add some utility functions that demonstrate the manifest concepts
 window.dateUtils = {
     // Validation examples from manifest
@@ -215,4 +335,3 @@ window.dateUtils = {
 // Make utilities available in console for testing
 console.log('Date utilities available as window.dateUtils');
 console.log('Manifest loaded as dateManifest variable');
-
