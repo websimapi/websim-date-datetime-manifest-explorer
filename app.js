@@ -196,6 +196,23 @@ async function parseTextWithAI() {
         const parsed = await aiDateParser.parseTextDate(input, format);
         
         if (parsed.success) {
+            let isVerifiedAccurate = false;
+            if (parsed.correctionSuccess === true) {
+                isVerifiedAccurate = true;
+            } else if (parsed.correctionSuccess === false) {
+                isVerifiedAccurate = false;
+            } else if (parsed.verificationResult) {
+                isVerifiedAccurate = parsed.verificationResult.success;
+            } else {
+                isVerifiedAccurate = true; 
+            }
+
+            let copyButtonHtml = '';
+            if (isVerifiedAccurate) {
+                const textToCopy = parsed.requestedFormat.replace(/'/g, "\\'");
+                copyButtonHtml = `<button class="btn" style="padding: 5px 10px; font-size: 0.8rem; margin-left: 10px;" onclick="copyToClipboard('${textToCopy}', this)">📋 Copy</button>`;
+            }
+
             let verificationHtml = '';
             if (parsed.verificationResult) {
                 const verification = parsed.verificationResult;
@@ -388,6 +405,46 @@ async function convertWithAI() {
     } catch (error) {
         result.innerHTML = `<div style="color: red;"><strong>❌ Error:</strong> ${error.message}</div>`;
     }
+}
+
+function copyToClipboard(text, buttonElement) {
+    if (!navigator.clipboard) {
+        try {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            if (buttonElement) {
+                const originalText = buttonElement.innerHTML;
+                buttonElement.innerHTML = 'Copied! ✅';
+                setTimeout(() => {
+                    buttonElement.innerHTML = originalText;
+                }, 2000);
+            }
+        } catch (err) {
+            console.error('Fallback copy failed', err);
+            alert('Failed to copy to clipboard.');
+        }
+        return;
+    }
+
+    navigator.clipboard.writeText(text).then(() => {
+        if (buttonElement) {
+            const originalText = buttonElement.innerHTML;
+            buttonElement.innerHTML = 'Copied! ✅';
+            setTimeout(() => {
+                buttonElement.innerHTML = originalText;
+            }, 2000);
+        }
+    }).catch(err => {
+        console.error('Failed to copy: ', err);
+        alert('Failed to copy to clipboard.');
+    });
 }
 
 // Add some utility functions that demonstrate the manifest concepts
