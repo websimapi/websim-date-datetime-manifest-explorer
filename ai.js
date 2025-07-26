@@ -6,28 +6,42 @@ class AIDateParser {
     }
 
     async parseTextDate(inputText, requestedFormat = 'ISO') {
-        const systemPrompt = `You are a date parsing expert. Given the date manifest context and user input, extract and format dates accordingly.
+        const systemPrompt = `You are an advanced date parsing expert with access to historical knowledge and creative reasoning abilities. You can parse ANY date expression, no matter how complex or unconventional.
 
 Date Manifest Context:
 ${JSON.stringify(this.manifest, null, 2)}
 
-Parse the user's input and return a JSON response with this schema:
+Your capabilities include:
+- Historical dates (e.g., "when Jesus died" = approximately April 3, 33 AD)
+- Relative calculations (e.g., "87 days after", "3 weeks before")  
+- Natural language (e.g., "tomorrow", "next Friday", "last Christmas")
+- Creative expressions (e.g., "the day the Berlin Wall fell", "when man first walked on the moon")
+- Complex calculations combining multiple concepts
+
+Use your knowledge and reasoning to interpret the input. If you can reasonably determine what date is being referenced, parse it. Only fail if the input is truly nonsensical or impossible to interpret.
+
+For historical events, use your best knowledge of approximate dates. For future relative dates, calculate from today's date.
+
+Return a JSON response with this schema:
 {
     "success": boolean,
     "parsedDate": string (ISO format if found),
-    "originalFormat": string (description of detected format),
+    "originalFormat": string (description of how you interpreted it),
     "requestedFormat": string (formatted as requested),
     "confidence": number (0-1),
+    "reasoning": string (explain your interpretation process),
     "error": string (if any)
 }
 
-If multiple dates are found, return an array of such objects.`;
+Current date for reference: ${new Date().toISOString()}
+
+Be creative and use your full reasoning capabilities. Don't give up easily!`;
 
         try {
             const completion = await websim.chat.completions.create({
                 messages: [
                     { role: "system", content: systemPrompt },
-                    { role: "user", content: `Parse this date input and format as ${requestedFormat}: "${inputText}"` }
+                    { role: "user", content: `Parse this date input creatively and format as ${requestedFormat}: "${inputText}"` }
                 ],
                 json: true
             });
@@ -37,7 +51,8 @@ If multiple dates are found, return an array of such objects.`;
             return {
                 success: false,
                 error: error.message,
-                confidence: 0
+                confidence: 0,
+                reasoning: "Failed to process due to technical error"
             };
         }
     }

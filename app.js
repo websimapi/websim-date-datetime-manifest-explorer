@@ -1,5 +1,4 @@
 let dateManifest = null;
-let aiDateParser = null;
 
 // Load the manifest on page load
 document.addEventListener('DOMContentLoaded', async function() {
@@ -200,13 +199,17 @@ async function parseTextWithAI() {
             result.innerHTML = `
                 <div style="color: green;"><strong>✅ Successfully parsed!</strong></div>
                 <div><strong>Original:</strong> ${input}</div>
-                <div><strong>Detected Format:</strong> ${parsed.originalFormat}</div>
+                <div><strong>Interpretation:</strong> ${parsed.originalFormat}</div>
                 <div><strong>Parsed Date:</strong> ${parsed.parsedDate}</div>
                 <div><strong>Requested Format:</strong> ${parsed.requestedFormat}</div>
                 <div><strong>Confidence:</strong> ${Math.round(parsed.confidence * 100)}%</div>
+                ${parsed.reasoning ? `<div><strong>AI Reasoning:</strong> ${parsed.reasoning}</div>` : ''}
             `;
         } else {
-            result.innerHTML = `<div style="color: red;"><strong>❌ Failed to parse:</strong> ${parsed.error}</div>`;
+            result.innerHTML = `
+                <div style="color: red;"><strong>❌ Failed to parse:</strong> ${parsed.error}</div>
+                ${parsed.reasoning ? `<div><strong>AI Reasoning:</strong> ${parsed.reasoning}</div>` : ''}
+            `;
         }
     } catch (error) {
         result.innerHTML = `<div style="color: red;"><strong>❌ Error:</strong> ${error.message}</div>`;
