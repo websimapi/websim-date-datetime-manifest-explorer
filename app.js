@@ -259,6 +259,30 @@ async function parseTextWithAI() {
                     </div>
                 `;
             }
+
+            // Add correction information if it was corrected
+            let correctionHtml = '';
+            if (parsed.originalAttempt) {
+                const correctionColor = parsed.correctionSuccess ? 'green' : 'red';
+                const correctionIcon = parsed.correctionSuccess ? '✅' : '❌';
+                
+                correctionHtml = `
+                    <div style="border-top: 2px solid #ff9800; margin-top: 15px; padding-top: 15px; background: #fff3e0; border-radius: 5px; padding: 15px;">
+                        <div style="color: #e65100;"><strong>🔄 Automatic Correction Applied</strong></div>
+                        <div style="margin: 10px 0;">The initial mathematical proof failed verification, so the AI recalculated automatically.</div>
+                        <div style="color: ${correctionColor};"><strong>${correctionIcon} Correction Result:</strong> ${parsed.correctionSuccess ? 'SUCCESSFUL' : 'ALSO FAILED'}</div>
+                        
+                        <details style="margin-top: 10px;">
+                            <summary style="cursor: pointer; font-weight: bold;">Show Original Failed Attempt</summary>
+                            <div style="margin-top: 10px; padding: 10px; background: #ffebee; border-radius: 3px;">
+                                <div><strong>Original AI Reasoning:</strong> ${parsed.originalAttempt.result.reasoning}</div>
+                                <div><strong>Original Date:</strong> ${parsed.originalAttempt.result.parsedDate}</div>
+                                <div><strong>Verification Errors:</strong> ${parsed.originalAttempt.verification.errors.join(', ')}</div>
+                            </div>
+                        </details>
+                    </div>
+                `;
+            }
             
             result.innerHTML = `
                 <div style="color: green;"><strong>✅ Successfully parsed!</strong></div>
@@ -268,6 +292,7 @@ async function parseTextWithAI() {
                 <div><strong>Requested Format:</strong> ${parsed.requestedFormat}</div>
                 <div><strong>Confidence:</strong> ${Math.round(parsed.confidence * 100)}%</div>
                 ${parsed.reasoning ? `<div><strong>AI Reasoning:</strong> ${parsed.reasoning}</div>` : ''}
+                ${correctionHtml}
                 ${mathProofHtml}
                 ${verificationHtml}
             `;

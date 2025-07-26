@@ -65,11 +65,17 @@ Be creative and use your full reasoning capabilities. Don't give up easily! Alwa
                 json: true
             });
 
-            const result = JSON.parse(completion.content);
+            let result = JSON.parse(completion.content);
             
             // Verify the mathematical proof if provided
             if (result.mathematicalProof) {
                 result.verificationResult = await this.verifyMathematicalProof(result.mathematicalProof, result.parsedDate);
+                
+                // If verification failed, ask AI to recalculate
+                if (!result.verificationResult.success) {
+                    console.log('Mathematical verification failed, asking AI to recalculate...');
+                    result = await this.recalculateWithCorrections(inputText, requestedFormat, result, result.verificationResult);
+                }
             }
 
             return result;
@@ -79,6 +85,72 @@ Be creative and use your full reasoning capabilities. Don't give up easily! Alwa
                 error: error.message,
                 confidence: 0,
                 reasoning: "Failed to process due to technical error"
+            };
+        }
+    }
+
+    async recalculateWithCorrections(originalInput, requestedFormat, originalResult, verificationResult) {
+        const correctionPrompt = `Your previous mathematical proof contained errors that failed verification. Here are the details:
+
+ORIGINAL INPUT: "${originalInput}"
+ORIGINAL RESULT: ${JSON.stringify(originalResult, null, 2)}
+
+VERIFICATION ERRORS: ${JSON.stringify(verificationResult, null, 2)}
+
+The verification system found these specific issues:
+${verificationResult.errors.join('\n')}
+
+Failed verification steps:
+${verificationResult.verifiedSteps.filter(step => !step.valid).map(step => 
+    `- ${step.type}: Expected ${step.expected}, but calculated ${step.calculated}`
+).join('\n')}
+
+CRITICAL: You must recalculate using the ACTUAL JavaScript Date system. Use these current reference points:
+- Current date: ${new Date().toISOString()}
+- Current Julian Day: ${this.calculateJulianDay(new Date())}
+
+For historical dates, calculate the Julian Day using the standard Julian Day formula and verify it matches JavaScript Date calculations.
+
+Provide a CORRECTED mathematical proof with accurate Julian Day numbers that will pass verification. Make sure all base dates use Julian Day numbers that match what JavaScript Date.getTime() produces.
+
+Return the same JSON schema as before, but with corrected calculations.`;
+
+        try {
+            const completion = await websim.chat.completions.create({
+                messages: [
+                    { role: "system", content: correctionPrompt },
+                    { role: "user", content: `Please recalculate with corrections for: "${originalInput}"` }
+                ],
+                json: true
+            });
+
+            const correctedResult = JSON.parse(completion.content);
+            
+            // Verify the corrected proof
+            if (correctedResult.mathematicalProof) {
+                correctedResult.verificationResult = await this.verifyMathematicalProof(correctedResult.mathematicalProof, correctedResult.parsedDate);
+                
+                // Store both original and corrected attempts for display
+                correctedResult.originalAttempt = {
+                    result: originalResult,
+                    verification: verificationResult
+                };
+                
+                if (correctedResult.verificationResult.success) {
+                    correctedResult.correctionSuccess = true;
+                } else {
+                    correctedResult.correctionSuccess = false;
+                    console.log('Correction also failed verification');
+                }
+            }
+
+            return correctedResult;
+        } catch (error) {
+            // If correction fails, return original with error info
+            return {
+                ...originalResult,
+                correctionError: error.message,
+                verificationResult: verificationResult
             };
         }
     }
